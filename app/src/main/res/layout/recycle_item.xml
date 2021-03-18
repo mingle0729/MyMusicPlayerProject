@@ -6,6 +6,7 @@
     android:orientation="horizontal">
 
     <ImageView
+        android:id="@+id/imgAlbum"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:src="@drawable/music_icon"/>
@@ -19,6 +20,7 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="음악이름"
@@ -27,6 +29,7 @@
             android:textSize="17dp"/>
 
         <TextView
+            android:id="@+id/tvSingerName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14dp"
@@ -42,6 +45,7 @@
         android:layout_marginRight="10dp">
 
     <TextView
+        android:id="@+id/tvTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="1:00"

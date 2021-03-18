@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@color/yellow_1">
+
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -19,12 +21,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:menu="@menu/insta_button_menu" />
+
     </LinearLayout>
+
 
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"/>
+
 
     <include layout="@layout/activity_drawable1" />
 
