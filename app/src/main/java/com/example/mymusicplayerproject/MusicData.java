@@ -63,31 +63,20 @@ public class MusicData {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        MusicData musicData = (MusicData) o;
-        return Objects.equals(id, musicData.id) &&
-                Objects.equals(artists, musicData.artists) &&
-                Objects.equals(title, musicData.title) &&
-                Objects.equals(albumArt, musicData.albumArt) &&
-                Objects.equals(duration, musicData.duration);
+    public boolean equals(Object obj) {
+        boolean equal = false;
+
+        if (obj instanceof MusicData) {
+            MusicData data = (MusicData) obj;
+            equal = (this.id).equals(data.getId());
+        }
+
+        return equal;
     }
 
-    @Override
-    public String toString() {
-        return "MusicData{" +
-                "id='" + id + '\'' +
-                ", artists='" + artists + '\'' +
-                ", title='" + title + '\'' +
-                ", albumArt='" + albumArt + '\'' +
-                ", duration='" + duration + '\'' +
-                '}';
-    }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, artists, title, albumArt, duration);
-    }
+
+
+
+
 }
