@@ -41,18 +41,22 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
-    private static final int SEARCH = 1, HOME = 2, HEART = 3;
-    private RecyclerView recycleSearch, recycleHome, recycleHeart;
+    private static final int  HOME = 1, HEART = 2;
+    private RecyclerView  recycleHome, recycleHeart;
     private BottomNavigationView mainMenuBar;
     private FrameLayout frameLayout;
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
 
-    private Fragment musicPlayer;
-    private FragmentSearch fragmentSearch;
+    private TextView tvTitle, tvSingerName, tvStartTime, tvEndTime;
+    private ImageButton ibSongList, ibSongHeart, ibPrevSong, ibPlay, ibNextSong;
+    private ImageView imgAlbum;
+    private SeekBar seekBar;
+
+    private MediaPlayer mediaPlayer = new MediaPlayer();
+
     private FragmentHome fragmentHome;
     private FragmentHeart fragmentHeart;
-
     //-----------------------------------------------------------
 
     private ArrayList<MusicData> musicDataArrayList = new ArrayList<>();
@@ -62,22 +66,15 @@ public class MainActivity extends AppCompatActivity {
 
     private MusicDB musicDB;
     private MusicAdapter musicHeartAdapter;
-
-
-
-    private TextView tvTitle, tvSingerName, tvStartTime, tvEndTime;
-    private ImageButton ibSongList, ibSongHeart, ibPrevSong, ibPlay, ibNextSong;
-    private ImageView imgAlbum;
-    private SeekBar seekBar;
-
-    private MainActivity mainActivity;
-    private MediaPlayer mediaPlayer = new MediaPlayer();
-
-    private int index;
     private MusicData musicData;
-    private MusicAdapter musicAdapter;
+    private MainActivity mainActivity;
 
+    //-----------------------------------------------------------
+
+    private long backTime = 0L;
     private boolean nowPlaying = false;
+    private int index;
+
 
 
     //화면이 멈췄을 때
@@ -92,6 +89,22 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    //어플 종료할 때
+    @Override
+    public void onBackPressed() {
+        long currentTime = System.currentTimeMillis();
+        long gapTime = currentTime - backTime;
+
+        if(gapTime >= 0 && gapTime <= 2000){
+            super.onBackPressed();
+            toastMessage("정상 종료");
+        }else{
+            backTime = currentTime;
+            toastMessage("연속으로 두 번 터치시 어플 종료");
+        }
+    }
+
+    //화면 설정함수
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,6 +137,8 @@ public class MainActivity extends AppCompatActivity {
         eventHandlerFunc();
     }// end of onCreate
 
+
+    //이벤트 처리 함수
     private void eventHandlerFunc() {
         ibPlay.setOnClickListener((View v) -> {
             if(nowPlaying == true) {
@@ -133,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 nowPlaying = true;
                 mediaPlayer.start();
-                ibPlay.setImageResource(R.drawable.pause);
+                ibPlay.setImageResource(R.drawable.ic_baseline_pause_24);
                 setSeekBarThread();
             }
         });
@@ -192,20 +207,21 @@ public class MainActivity extends AppCompatActivity {
                 }
                 musicDB.updateQuery(musicDataArrayList);
             } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), "노래를 골라주세요", Toast.LENGTH_SHORT).show();
+                toastMessage("곡 선택 요망");
             }
         });
     }
 
 
+    //좋아요 리스트 정보 받아오기
     public ArrayList<MusicData> getLikeList() {
 
         musicLikeArrayList = musicDB.saveLikeList();
 
         if (musicLikeArrayList.isEmpty()) {
-            Toast.makeText(this, "좋아요 리스트 가져오기 실패", Toast.LENGTH_SHORT).show();
+            toastMessage("좋아요 리스트 가져오기 실패");
         } else {
-            Toast.makeText(this, "좋아요 리스트 가져오기 성공", Toast.LENGTH_SHORT).show();
+            toastMessage("좋아요 리스트 가져오기 성공");
         }
 
         return musicLikeArrayList;
@@ -230,15 +246,13 @@ public class MainActivity extends AppCompatActivity {
     //--------------------------------------------------------------------------------
 
 
+    //프레그먼트 이용해서 화면 바꾸기
     public void changFragment() {
-        //프레그먼트 이용해서 화면 바꾸기
+
         mainMenuBar.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.menuSearch:
-                        setFragmentChange(SEARCH);
-                        break;
                     case R.id.menuHome:
                         setFragmentChange(HOME);
                         break;
@@ -257,6 +271,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //뮤직플레이어에 데이타 세팅하기
     public void setPlayerData(int position, boolean flag) {
         drawerLayout.openDrawer(Gravity.LEFT);
         index = position;
@@ -305,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
             mediaPlayer.setDataSource(this, musicURI);
             mediaPlayer.prepare();
             mediaPlayer.start();
-            ibPlay.setImageResource(R.drawable.pause);
+            ibPlay.setImageResource(R.drawable.ic_baseline_pause_24);
             nowPlaying =true;
             seekBar.setProgress(0);
             seekBar.setMax(Integer.parseInt(musicData.getDuration()));
@@ -327,39 +342,41 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //시크바 설정하기
     public void seekBarChange(){
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int position, boolean flag) {
-                if (flag){
-                    mediaPlayer.seekTo(position);
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                // 사용자 조작시, seekbar 이동
+                if(b){
+                    mediaPlayer.seekTo(i);
                 }
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
+            public void onStartTrackingTouch(SeekBar seekBar) {            }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
+            public void onStopTrackingTouch(SeekBar seekBar) {            }
         });
     }
 
+    //시크바 스레드 처리하기
     private void setSeekBarThread() {
         Thread thread = new Thread(new Runnable() {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
 
             @Override
             public void run() {
+                seekBar.setMax(mediaPlayer.getDuration());
+
                 while (mediaPlayer.isPlaying()) {
                     seekBar.setProgress(mediaPlayer.getCurrentPosition());
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             tvStartTime.setText(simpleDateFormat.format(mediaPlayer.getCurrentPosition()));
+                            tvEndTime.setText(simpleDateFormat.format(mediaPlayer.getDuration()));
                         }
                     });
                     SystemClock.sleep(100);
@@ -374,10 +391,6 @@ public class MainActivity extends AppCompatActivity {
     public void setFragmentChange(int i) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         switch (i) {
-            case SEARCH:
-                ft.replace(R.id.frameLayout, fragmentSearch);
-                ft.commit();
-                break;
             case HOME:
                 ft.replace(R.id.frameLayout, fragmentHome);
                 ft.commit();
@@ -387,7 +400,11 @@ public class MainActivity extends AppCompatActivity {
                 ft.commit();
                 break;
         }
+    }
 
+    //출력 함수
+    public void toastMessage(String s) {
+        Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
     }
 
     //객체 찾는 함수
@@ -398,11 +415,9 @@ public class MainActivity extends AppCompatActivity {
         frameLayout = findViewById(R.id.frameLayout);
         drawerLayout = findViewById(R.id.drawerLayout);
 
-        recycleSearch = findViewById(R.id.recycleSearch);
         recycleHome = findViewById(R.id.recycleHome);
         recycleHeart = findViewById(R.id.recycleHeart);
 
-        fragmentSearch = new FragmentSearch();
         fragmentHome = new FragmentHome();
         fragmentHeart = new FragmentHeart();
 

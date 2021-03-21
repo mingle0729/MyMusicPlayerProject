@@ -1,15 +1,11 @@
 package com.example.mymusicplayerproject;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -48,7 +44,7 @@ public class FragmentHeart extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.activity_mainfragment3, container, false);
+        View view = inflater.inflate(R.layout.activity_fragment_heart, container, false);
 
         findViewByIdFunc(view);
         //MP3 파일 관리하는 함수
