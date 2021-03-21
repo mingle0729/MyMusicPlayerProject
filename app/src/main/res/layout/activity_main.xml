@@ -2,6 +2,7 @@
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -10,6 +11,7 @@
 
 
     <LinearLayout
+        android:id="@+id/linear"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal">
@@ -33,7 +35,6 @@
         </androidx.appcompat.widget.Toolbar>
     </LinearLayout>
 
-
     <FrameLayout
         android:id="@+id/frameLayout"
         style="@style/Theme.AppCompat.Light"
@@ -41,7 +42,6 @@
         android:layout_height="match_parent">
 
     </FrameLayout>
-
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -59,7 +59,6 @@
 
     </LinearLayout>
 
-
-    <include layout="@layout/activity_drawable1" />
+    <include layout="@layout/activity_drawable" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -12,13 +12,17 @@ public class MusicData {
     private String title;
     private String albumArt;
     private String duration;
+    private int count;
+    private int liked;
 
-    public MusicData(String id, String artists, String title, String albumArt, String duration) {
+    public MusicData(String id, String artists, String title, String albumArt, String duration,int count, int liked) {
         this.id = id;
         this.artists = artists;
         this.title = title;
         this.albumArt = albumArt;
         this.duration = duration;
+        this.count = count;
+        this.liked = liked;
     }
 
     public String getId() {
@@ -61,6 +65,22 @@ public class MusicData {
         this.duration = duration;
     }
 
+    public int getLiked() {
+        return liked;
+    }
+
+    public void setLiked(int liked) {
+        this.liked = liked;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public boolean equals(Object obj) {
@@ -73,10 +93,4 @@ public class MusicData {
 
         return equal;
     }
-
-
-
-
-
-
 }

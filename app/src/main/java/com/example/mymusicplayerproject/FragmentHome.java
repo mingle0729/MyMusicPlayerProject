@@ -2,8 +2,10 @@ package com.example.mymusicplayerproject;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +13,10 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,11 +24,13 @@ import java.util.ArrayList;
 
 public class FragmentHome extends Fragment {
 
-    private ArrayList<MusicData> sdCardList = new ArrayList<MusicData>();
+    private ArrayList<MusicData> musicDataArrayList = new ArrayList<MusicData>();
     private MusicAdapter musicAdapter;
     private MusicDB musicDB;
     private RecyclerView recycleHome;
+    private DrawerLayout drawerLayout;
     private MainActivity mainActivity;
+    private Fragment musicPlayer;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -48,32 +55,58 @@ public class FragmentHome extends Fragment {
 
         //MP3 파일 관리하는 함수
         musicDB= MusicDB.getInstance(mainActivity.getApplicationContext());
-        sdCardList = musicDB.findContentProvMp3List();
+        musicDataArrayList = musicDB.findContentProvMp3List();
 
         //어뎁터 만들기
         makeAdapter(container);
 
-        //이벤트 함수
-       // eventHandlerFunc();
+        //음악리스트 가져오기
+        musicDataArrayList = musicDB.compareArrayList();
+        //음악DB저장
+        musicDB.insertQuery(musicDataArrayList);
+        //어뎁터에 데이터 세팅하기
+        settingAdapterDataList(musicDataArrayList);
+
+        //
+        eventHandler();
 
         return view;
+    }
+
+    public void eventHandler() {
+        musicAdapter.setOnItemClickListener(new MusicAdapter.OnItemClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onItemClick(View view, int position) {
+                mainActivity.setPlayerData(position, true);
+            }
+        });
+    }
+
+    public void settingAdapterDataList(ArrayList<MusicData> musicDataArrayList) {
+
+        musicAdapter.setMusicList(musicDataArrayList);
+
+        recycleHome.setAdapter(musicAdapter);
+        musicAdapter.notifyDataSetChanged();
+
     }
 
     //어뎁터 만들기
     public void makeAdapter(ViewGroup container) {
 
-        musicAdapter = new MusicAdapter(container.getContext(), sdCardList);
+        musicAdapter = new MusicAdapter(container.getContext());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(container.getContext());
         recycleHome.setLayoutManager(linearLayoutManager);
         recycleHome.setAdapter(musicAdapter);
+        recycleHome.setLayoutManager(linearLayoutManager);
 
     }
 
-    public void eventHandlerFunc() {
 
-    }
 
     public void findViewByIdFunc(View view) {
         recycleHome = view.findViewById(R.id.recycleHome);
+        drawerLayout = view.findViewById(R.id.drawerLayout);
     }
 }
