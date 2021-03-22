@@ -302,6 +302,21 @@ public class MainActivity extends AppCompatActivity {
                 toastMessage("곡 선택 요망");
             }
         });
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                // 사용자 조작시, seekbar 이동
+                if(b){
+                    mediaPlayer.seekTo(i);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
     }
 
 
@@ -378,24 +393,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //시크바 설정하기
-    public void seekBarChange(){
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                // 사용자 조작시, seekbar 이동
-                if(b){
-                    mediaPlayer.seekTo(i);
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
-    }
 
     //시크바 스레드 처리하기
     private void setSeekBarThread() {

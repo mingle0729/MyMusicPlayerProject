@@ -46,8 +46,10 @@ public class FragmentHeart extends Fragment {
 
         View view = inflater.inflate(R.layout.activity_fragment_heart, container, false);
 
+        //객체 찾아오기
         findViewByIdFunc(view);
-        //MP3 파일 관리하는 함수
+
+        //MP3 파일 관리
         musicDB= MusicDB.getInstance(mainActivity.getApplicationContext());
         musicDataArrayList = musicDB.saveLikeList();
 
@@ -67,25 +69,13 @@ public class FragmentHeart extends Fragment {
         return view;
     }
 
-    public void eventHandler() {
-        musicAdapter.setOnItemClickListener(new MusicAdapter.OnItemClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onItemClick(View view, int position) {
-                mainActivity.setPlayerData(position, false);
-            }
-        });
+
+    // 객체 찾아오기
+    public void findViewByIdFunc(View view) {
+        recycleHeart = view.findViewById(R.id.recycleHeart);
+        drawerLayout = view.findViewById(R.id.drawerLayout);
     }
 
-    public void settingAdapterDataList(ArrayList<MusicData> musicDataArrayList) {
-
-        musicAdapter.setMusicList(musicDataArrayList);
-
-        recycleHeart.setAdapter(musicAdapter);
-
-        musicAdapter.notifyDataSetChanged();
-
-    }
 
     //어뎁터 만들기
     public void makeAdapter(ViewGroup container) {
@@ -99,8 +89,26 @@ public class FragmentHeart extends Fragment {
 
     }
 
-    public void findViewByIdFunc(View view) {
-        recycleHeart = view.findViewById(R.id.recycleHeart);
-        drawerLayout = view.findViewById(R.id.drawerLayout);
+    //어뎁터에 데이터를 세팅하기
+    public void settingAdapterDataList(ArrayList<MusicData> musicDataArrayList) {
+
+        musicAdapter.setMusicList(musicDataArrayList);
+
+        recycleHeart.setAdapter(musicAdapter);
+
+        musicAdapter.notifyDataSetChanged();
+
+    }
+
+    //리스트 클릭시에 뮤직플레이어 띄우기
+    public void eventHandler() {
+        musicAdapter.setOnItemClickListener(new MusicAdapter.OnItemClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+
+            public void onItemClick(View view, int position) {
+                mainActivity.setPlayerData(position, false);
+            }
+        });
     }
 }

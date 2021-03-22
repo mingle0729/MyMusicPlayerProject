@@ -48,7 +48,7 @@ public class FragmentHome extends Fragment {
         //객체 찾는 함수
         findViewByIdFunc(view);
 
-        //MP3 파일 관리하는 함수
+        //MP3 파일 관리
         musicDB= MusicDB.getInstance(mainActivity.getApplicationContext());
         musicDataArrayList = musicDB.findContentProvMp3List();
 
@@ -68,24 +68,13 @@ public class FragmentHome extends Fragment {
         return view;
     }
 
-    public void eventHandler() {
-        musicAdapter.setOnItemClickListener(new MusicAdapter.OnItemClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onItemClick(View view, int position) {
-                mainActivity.setPlayerData(position, true);
-            }
-        });
+
+    //객체 찾아오기
+    public void findViewByIdFunc(View view) {
+        recycleHome = view.findViewById(R.id.recycleHome);
+        drawerLayout = view.findViewById(R.id.drawerLayout);
     }
 
-    public void settingAdapterDataList(ArrayList<MusicData> musicDataArrayList) {
-
-        musicAdapter.setMusicList(musicDataArrayList);
-
-        recycleHome.setAdapter(musicAdapter);
-        musicAdapter.notifyDataSetChanged();
-
-    }
 
     //어뎁터 만들기
     public void makeAdapter(ViewGroup container) {
@@ -98,10 +87,27 @@ public class FragmentHome extends Fragment {
 
     }
 
+    //어뎁터에 데이터 세팅하기
+    public void settingAdapterDataList(ArrayList<MusicData> musicDataArrayList) {
 
+        musicAdapter.setMusicList(musicDataArrayList);
 
-    public void findViewByIdFunc(View view) {
-        recycleHome = view.findViewById(R.id.recycleHome);
-        drawerLayout = view.findViewById(R.id.drawerLayout);
+        recycleHome.setAdapter(musicAdapter);
+        musicAdapter.notifyDataSetChanged();
+
     }
+
+    //리스트 클릭 시에 플래이 정보 가져오기
+
+    public void eventHandler() {
+        musicAdapter.setOnItemClickListener(new MusicAdapter.OnItemClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onItemClick(View view, int position) {
+                mainActivity.setPlayerData(position, true);
+            }
+        });
+    }
+
+
 }

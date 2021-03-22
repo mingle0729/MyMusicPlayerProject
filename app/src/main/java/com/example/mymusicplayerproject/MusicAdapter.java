@@ -36,6 +36,8 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.CustomViewHo
         this.context = context;
     }
 
+
+
     @NonNull
     @Override
     public MusicAdapter.CustomViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
@@ -44,6 +46,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.CustomViewHo
         CustomViewHolder viewHolder = new CustomViewHolder(view);
         return viewHolder;
     }
+
 
     @Override
     public void onBindViewHolder(@NonNull CustomViewHolder customViewHolder, int position) {
@@ -61,16 +64,21 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.CustomViewHo
     }
 
 
+    // 앨범아트 가져오는 함수
     public Bitmap getAlbumImg(Context context, int albumArt, int imgMaxSize) {
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         ContentResolver contentResolver = context.getContentResolver();
+
         Uri uri = Uri.parse("content://media/external/audio/albumart/" + albumArt);
 
         if (uri != null) {
             ParcelFileDescriptor fd = null;
             try {
                 fd = contentResolver.openFileDescriptor(uri, "r");
+
+                //값이 true면 메모리를 할당하지 않아서 비트맵을 반환하지 않음.
+                // fields는 값이 채워지기 때문에 Load 하려는 이미지의 크기를 포함한 정보들을 얻어올 수 있음.
                 options.inJustDecodeBounds = true;
 
                 int scale = 0;
@@ -78,10 +86,11 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.CustomViewHo
                     scale = (int)Math.pow(2,(int) Math.round(Math.log(imgMaxSize / (double) Math.max(options.outHeight, options.outWidth)) / Math.log(0.5)));
                 }
 
-                options.inJustDecodeBounds = false;
-                options.inSampleSize = scale;
+                options.inJustDecodeBounds = false; // true일시 해당 이미지의 정보만 가져옴
+                options.inSampleSize = scale; // 원본 사이즈를 설정된 스케일로 축소
 
                 Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fd.getFileDescriptor(), null, options);
+
                 if(bitmap != null){
                     if(options.outWidth != imgMaxSize || options.outHeight != imgMaxSize){
                         Bitmap tmp = Bitmap.createScaledBitmap(bitmap, imgMaxSize, imgMaxSize, true);

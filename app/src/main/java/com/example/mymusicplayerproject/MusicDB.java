@@ -163,7 +163,7 @@ public class MusicDB extends SQLiteOpenHelper {
         return musicDataArrayList;
     }
 
-    //비교,,,
+    //비교함수
     public ArrayList<MusicData> compareArrayList() {
         ArrayList<MusicData> sdCardList = findContentProvMp3List();
         ArrayList<MusicData> dbList = selectMusicTBL();
