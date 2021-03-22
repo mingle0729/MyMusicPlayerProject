@@ -31,8 +31,6 @@
             android:layout_marginTop="5dp"
             android:text="가수명"
             android:textSize="16dp" />
-
-
     </LinearLayout>
 
     <FrameLayout
@@ -142,8 +140,5 @@
             android:layout_marginRight="50dp"
             android:src="@drawable/ic_baseline_skip_next_24"
             android:background="@color/white"/>
-
-
     </LinearLayout>
-
 </LinearLayout>
