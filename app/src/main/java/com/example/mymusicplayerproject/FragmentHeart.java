@@ -82,6 +82,7 @@ public class FragmentHeart extends Fragment {
         musicAdapter.setMusicList(musicDataArrayList);
 
         recycleHeart.setAdapter(musicAdapter);
+
         musicAdapter.notifyDataSetChanged();
 
     }
@@ -91,6 +92,7 @@ public class FragmentHeart extends Fragment {
 
         musicAdapter = new MusicAdapter(container.getContext());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(container.getContext());
+
         recycleHeart.setLayoutManager(linearLayoutManager);
         recycleHeart.setAdapter(musicAdapter);
         recycleHeart.setLayoutManager(linearLayoutManager);

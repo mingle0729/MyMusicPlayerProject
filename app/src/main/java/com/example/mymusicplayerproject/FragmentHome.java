@@ -92,9 +92,9 @@ public class FragmentHome extends Fragment {
 
         musicAdapter = new MusicAdapter(container.getContext());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(container.getContext());
+
         recycleHome.setLayoutManager(linearLayoutManager);
         recycleHome.setAdapter(musicAdapter);
-        recycleHome.setLayoutManager(linearLayoutManager);
 
     }
 

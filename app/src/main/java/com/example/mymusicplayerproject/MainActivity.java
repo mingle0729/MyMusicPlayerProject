@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView mainMenuBar;
     private FrameLayout frameLayout;
     private DrawerLayout drawerLayout;
-    private Toolbar toolbar;
 
     private TextView tvTitle, tvSingerName, tvStartTime, tvEndTime;
     private ImageButton ibSongList, ibSongHeart, ibPrevSong, ibPlay, ibNextSong;
@@ -104,23 +103,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //화면 설정함수
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //액션바
-        setSupportActionBar(toolbar);
 
+
+        //객체 찾아오기
         findViewByIdFunc();
+
         //권한 부여하기
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE},
                 MODE_PRIVATE);
 
-        //
-
+        //DB연결하기
         musicDB = MusicDB.getInstance(MainActivity.this);
 
         musicDataArrayList = musicDB.compareArrayList();
@@ -128,125 +127,48 @@ public class MainActivity extends AppCompatActivity {
 
         musicDB.insertQuery(musicDataArrayList);
 
-        //객체 찾는 함수
 
 
         //프레그먼트 화면 바꾸기
         changFragment();
 
+        //이벤트 처리하기
         eventHandlerFunc();
+
     }// end of onCreate
 
 
-    //이벤트 처리 함수
-    private void eventHandlerFunc() {
-        ibPlay.setOnClickListener((View v) -> {
-            if(nowPlaying == true) {
-                nowPlaying = false;
-                mediaPlayer.pause();
-                ibPlay.setImageResource(R.drawable.ic_baseline_play_arrow_24);
-            } else {
-                nowPlaying = true;
-                mediaPlayer.start();
-                ibPlay.setImageResource(R.drawable.ic_baseline_pause_24);
-                setSeekBarThread();
-            }
-        });
-        ibPrevSong.setOnClickListener((View v) -> {
-            SimpleDateFormat sdfS = new SimpleDateFormat("ss");
-            int nowDurationForSec =  Integer.parseInt(sdfS.format(mediaPlayer.getCurrentPosition()));
 
-            mediaPlayer.stop();
-            mediaPlayer.reset();
-            nowPlaying =false;
-            ibPlay.setImageResource(R.drawable.ic_baseline_play_arrow_24);
-            try {
-                if(nowDurationForSec <=5) {
-                    if(index == 0)  {
-                        index = musicDataArrayList.size() -1;
-                        setPlayerData(index, true);
-                    } else {
-                        index--;
-                        setPlayerData(index, true);
-                    }
-                } else {
-                    setPlayerData(index, true);
-                }
-            } catch (Exception e) {
-                Log.d("Prev", e.getMessage());
-            }
-        });
-        ibNextSong.setOnClickListener((View v) -> {
-            mediaPlayer.stop();
-            mediaPlayer.reset();
-            nowPlaying =false;
-            ibPlay.setImageResource(R.drawable.ic_baseline_play_arrow_24);
-            try {
-                if(index == musicDataArrayList.size() -1) {
-                    index = 0;
-                    setPlayerData(index, true);
-                } else {
-                    index++;
-                    setPlayerData(index, true);
-                }
-            } catch (Exception e) {
-                Log.d("Next", e.getMessage());
-            }
-        });
+    //객체 찾는 함수
+    public void findViewByIdFunc() {
 
-        ibSongHeart.setOnClickListener((View v) -> {
-            try {
-                if(musicData.getLiked() == 1){
-                    musicData.setLiked(0);
-                    musicLikeArrayList.remove(musicData);
-                    ibSongHeart.setImageResource(R.drawable.ic_baseline_favorite_border_24);
-                }else{
-                    musicData.setLiked(1);
-                    musicLikeArrayList.add(musicData);
-                    ibSongHeart.setImageResource(R.drawable.ic_baseline_favorite_24);
-                }
-                musicDB.updateQuery(musicDataArrayList);
-            } catch (Exception e) {
-                toastMessage("곡 선택 요망");
-            }
-        });
+        mainMenuBar = findViewById(R.id.mainMenuBar);
+        frameLayout = findViewById(R.id.frameLayout);
+        drawerLayout = findViewById(R.id.drawerLayout);
+
+        recycleHome = findViewById(R.id.recycleHome);
+        recycleHeart = findViewById(R.id.recycleHeart);
+
+        fragmentHome = new FragmentHome();
+        fragmentHeart = new FragmentHeart();
+
+        ibSongList = findViewById(R.id.ibSongList);
+        ibSongHeart = findViewById(R.id.ibSongHeart);
+        ibPrevSong = findViewById(R.id.ibPrevSong);
+        ibPlay = findViewById(R.id.ibPlay);
+        ibNextSong = findViewById(R.id.ibNextSong);
+        imgAlbum = findViewById(R.id.imgAlbum);
+        seekBar = findViewById(R.id.seekBar);
+        tvTitle = findViewById(R.id.tvTitle);
+        tvSingerName = findViewById(R.id.tvSingerName);
+        tvStartTime = findViewById(R.id.tvStartTime);
+        tvEndTime = findViewById(R.id.tvEndTime);
     }
 
-
-    //좋아요 리스트 정보 받아오기
-    public ArrayList<MusicData> getLikeList() {
-
-        musicLikeArrayList = musicDB.saveLikeList();
-
-        if (musicLikeArrayList.isEmpty()) {
-            toastMessage("좋아요 리스트 가져오기 실패");
-        } else {
-            toastMessage("좋아요 리스트 가져오기 성공");
-        }
-
-        return musicLikeArrayList;
-    }
-
-
-    //--------------------------------------------------------------------------------
-
-    public ArrayList<MusicData> getMusicDataArrayList() {
-        return musicDataArrayList;
-    }
-
-    public ArrayList<MusicData> getMusicLikeArrayList() {
-        return musicLikeArrayList;
-    }
-
-    public MusicAdapter getMusicHeartAdapter() {
-        return musicHeartAdapter;
-    }
-
-
-    //--------------------------------------------------------------------------------
 
 
     //프레그먼트 이용해서 화면 바꾸기
+
     public void changFragment() {
 
         mainMenuBar.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -271,8 +193,121 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //메인 메뉴바 화면 바꾸는 함수
+    public void setFragmentChange(int i) {
+
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+        switch (i) {
+
+            case HOME:
+                ft.replace(R.id.frameLayout, fragmentHome);
+                ft.commit();
+                break;
+
+            case HEART:
+                ft.replace(R.id.frameLayout, fragmentHeart);
+                ft.commit();
+                break;
+        }
+    }
+
+
+
+    //이벤트 처리 함수
+    private void eventHandlerFunc() {
+
+        ibPlay.setOnClickListener((View v) -> {
+            if(nowPlaying == true) {
+
+                nowPlaying = false;
+                mediaPlayer.pause();
+                ibPlay.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+
+            } else {
+
+                nowPlaying = true;
+                mediaPlayer.start();
+                ibPlay.setImageResource(R.drawable.ic_baseline_pause_24);
+                setSeekBarThread();
+            }
+        });
+
+        ibPrevSong.setOnClickListener((View v) -> {
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ss");
+            int nowDurationForSec =  Integer.parseInt(simpleDateFormat.format(mediaPlayer.getCurrentPosition()));
+
+            mediaPlayer.stop();
+            mediaPlayer.reset();
+            nowPlaying =false;
+
+            ibPlay.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+
+            try {
+                if(nowDurationForSec <=5) {
+                    if(index == 0)  {
+                        index = musicDataArrayList.size() -1;
+                        setPlayerData(index, true);
+                    } else {
+                        index--;
+                        setPlayerData(index, true);
+                    }
+                } else {
+                    setPlayerData(index, true);
+                }
+            } catch (Exception e) {
+                Log.d("Prev", e.getMessage());
+            }
+        });
+
+        ibNextSong.setOnClickListener((View v) -> {
+
+            mediaPlayer.stop();
+            mediaPlayer.reset();
+            nowPlaying =false;
+            ibPlay.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+
+            try {
+                if( index == musicDataArrayList.size() -1 ) {
+                    index = 0;
+                    setPlayerData(index, true);
+                } else {
+                    index++;
+                    setPlayerData(index, true);
+                }
+            } catch (Exception e) {
+                Log.d("Next", e.getMessage());
+            }
+        });
+
+        ibSongHeart.setOnClickListener((View v) -> {
+            try {
+                if( musicData.getLiked() == 1 ){
+
+                    musicData.setLiked(0);
+                    musicLikeArrayList.remove(musicData);
+                    ibSongHeart.setImageResource(R.drawable.ic_baseline_favorite_border_24);
+
+                }else{
+
+                    musicData.setLiked(1);
+                    musicLikeArrayList.add(musicData);
+                    ibSongHeart.setImageResource(R.drawable.ic_baseline_favorite_24);
+
+                }
+                musicDB.updateQuery(musicDataArrayList);
+
+            } catch ( Exception e) {
+                toastMessage("곡 선택 요망");
+            }
+        });
+    }
+
+
     //뮤직플레이어에 데이타 세팅하기
     public void setPlayerData(int position, boolean flag) {
+
         drawerLayout.openDrawer(Gravity.LEFT);
         index = position;
 
@@ -301,6 +336,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(musicData.getLiked() == 1) {
+
             ibSongHeart.setImageResource(R.drawable.ic_baseline_favorite_24);
         } else {
             ibSongHeart.setImageResource(R.drawable.ic_baseline_favorite_border_24);
@@ -339,8 +375,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
+
 
     //시크바 설정하기
     public void seekBarChange(){
@@ -354,10 +390,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {            }
+            public void onStartTrackingTouch(SeekBar seekBar) {}
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {            }
+            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
     }
 
@@ -368,18 +404,22 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void run() {
+                //시크바에 전체 시간을 가져와서 세팅해주기
                 seekBar.setMax(mediaPlayer.getDuration());
 
                 while (mediaPlayer.isPlaying()) {
+
                     seekBar.setProgress(mediaPlayer.getCurrentPosition());
+
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
                             tvStartTime.setText(simpleDateFormat.format(mediaPlayer.getCurrentPosition()));
                             tvEndTime.setText(simpleDateFormat.format(mediaPlayer.getDuration()));
                         }
                     });
-                    SystemClock.sleep(100);
+                    SystemClock.sleep(10);
                 }
             }
         });
@@ -387,50 +427,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //메인 메뉴바 화면 바꾸는 함수
-    public void setFragmentChange(int i) {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        switch (i) {
-            case HOME:
-                ft.replace(R.id.frameLayout, fragmentHome);
-                ft.commit();
-                break;
-            case HEART:
-                ft.replace(R.id.frameLayout, fragmentHeart);
-                ft.commit();
-                break;
+
+    //좋아요 리스트 정보 받아오기
+    public ArrayList<MusicData> getLikeList() {
+
+        musicLikeArrayList = musicDB.saveLikeList();
+
+        if (musicLikeArrayList.isEmpty()) {
+            toastMessage("좋아요 리스트 가져오기 실패");
+        } else {
+            toastMessage("좋아요 리스트 가져오기 성공");
         }
+
+        return musicLikeArrayList;
     }
+
+
+    //--------------------------------------------------------------------------------
+
+    public ArrayList<MusicData> getMusicDataArrayList() {
+        return musicDataArrayList;
+    }
+
+    public ArrayList<MusicData> getMusicLikeArrayList() {
+        return musicLikeArrayList;
+    }
+
+    public MusicAdapter getMusicHeartAdapter() {
+        return musicHeartAdapter;
+    }
+
+
+    //--------------------------------------------------------------------------------
 
     //출력 함수
     public void toastMessage(String s) {
         Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
     }
 
-    //객체 찾는 함수
-    public void findViewByIdFunc() {
-        toolbar = findViewById(R.id.toolbar);
-
-        mainMenuBar = findViewById(R.id.mainMenuBar);
-        frameLayout = findViewById(R.id.frameLayout);
-        drawerLayout = findViewById(R.id.drawerLayout);
-
-        recycleHome = findViewById(R.id.recycleHome);
-        recycleHeart = findViewById(R.id.recycleHeart);
-
-        fragmentHome = new FragmentHome();
-        fragmentHeart = new FragmentHeart();
-
-        ibSongList = findViewById(R.id.ibSongList);
-        ibSongHeart = findViewById(R.id.ibSongHeart);
-        ibPrevSong = findViewById(R.id.ibPrevSong);
-        ibPlay = findViewById(R.id.ibPlay);
-        ibNextSong = findViewById(R.id.ibNextSong);
-        imgAlbum = findViewById(R.id.imgAlbum);
-        seekBar = findViewById(R.id.seekBar);
-        tvTitle = findViewById(R.id.tvTitle);
-        tvSingerName = findViewById(R.id.tvSingerName);
-        tvStartTime = findViewById(R.id.tvStartTime);
-        tvEndTime = findViewById(R.id.tvEndTime);
-    }
 }

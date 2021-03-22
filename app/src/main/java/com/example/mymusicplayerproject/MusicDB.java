@@ -18,13 +18,16 @@ public class MusicDB extends SQLiteOpenHelper {
     private static final int VERSION = 1;
     private Context context;
 
+    // 싱글톤 객체 선언 ( 정적으로 )
     private static MusicDB musicDB;
 
+    //생성자 오버라이딩
     private MusicDB(@Nullable Context context) {
         super(context, DATABASE, null, VERSION);
         this.context = context;
     }
 
+    //싱글톤 함수 만들어서 디비를 한번만 가져온다.
     public static MusicDB getInstance(Context context) {
         if (musicDB == null) {
             musicDB = new MusicDB(context);
@@ -32,6 +35,7 @@ public class MusicDB extends SQLiteOpenHelper {
         return musicDB;
     }
 
+    //테이블 생성함수
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(
@@ -45,12 +49,14 @@ public class MusicDB extends SQLiteOpenHelper {
                         "liked integer);");
     }
 
+    //테이블 업데이트 함수 ( 테이블 삭제 후 다시 생성 )
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL("drop table if exists mp3TBL");
         onCreate(sqLiteDatabase);
     }
 
+    //테이블 출력 함수
     public ArrayList<MusicData> selectMusicTBL() {
 
         ArrayList<MusicData> musicDBlist = new ArrayList<MusicData>();
@@ -75,6 +81,7 @@ public class MusicDB extends SQLiteOpenHelper {
         return musicDBlist;
     }
 
+    // 데이터 삽입하기
     public boolean insertQuery(ArrayList<MusicData> musicDataArrayList) {
         boolean retureValue = false;
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
@@ -105,6 +112,7 @@ public class MusicDB extends SQLiteOpenHelper {
     }
 
 
+    //데이터 업데이트 하기
     public boolean updateQuery(ArrayList<MusicData> musicDataArrayList) {
         boolean retureValue = false;
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
@@ -125,6 +133,7 @@ public class MusicDB extends SQLiteOpenHelper {
         return retureValue;
     }
 
+    //파일을 저장하고 관리해준는 구문.
     public ArrayList<MusicData> findContentProvMp3List() {
         ArrayList<MusicData> musicDataArrayList = new ArrayList<>();
 
@@ -154,6 +163,7 @@ public class MusicDB extends SQLiteOpenHelper {
         return musicDataArrayList;
     }
 
+    //비교,,,
     public ArrayList<MusicData> compareArrayList() {
         ArrayList<MusicData> sdCardList = findContentProvMp3List();
         ArrayList<MusicData> dbList = selectMusicTBL();
@@ -177,6 +187,7 @@ public class MusicDB extends SQLiteOpenHelper {
         return dbList;
     }
 
+    //좋아요 리스트 출력함수
     public ArrayList<MusicData> saveLikeList() {
         ArrayList<MusicData> likeMusicList = new ArrayList<MusicData>();
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
